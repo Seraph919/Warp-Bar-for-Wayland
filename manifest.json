@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "seraph.warp",
+  "name": "Cloudflare WARP",
+  "version": "1.0.0",
+  "author": "seraph",
+  "description": "Cloudflare WARP connection, DNS modes, and family filtering",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "BarWidget.qml"},
+  "barWidget": {
+    "displayName": "WARP",
+    "description": "Connect and manage Cloudflare WARP",
+    "category": "Network",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

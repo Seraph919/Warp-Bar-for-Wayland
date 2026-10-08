@@ -1,0 +1,4 @@
+#custom-warp { padding: 0 10px; }
+#custom-warp.connected { color: #8ec07c; }
+#custom-warp.disconnected { color: #a89984; }
+#custom-warp.error, #custom-warp.missing { color: #fb4934; }

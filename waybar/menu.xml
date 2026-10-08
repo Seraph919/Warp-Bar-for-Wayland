@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkMenu" id="menu">
+    <child><object class="GtkMenuItem" id="connect"><property name="label">Connect</property></object></child>
+    <child><object class="GtkMenuItem" id="disconnect"><property name="label">Disconnect</property></object></child>
+    <child><object class="GtkSeparatorMenuItem"/></child>
+    <child><object class="GtkMenuItem" id="doh"><property name="label">DNS only (DoH)</property></object></child>
+    <child><object class="GtkMenuItem" id="tunnel"><property name="label">WARP + DNS (DoH)</property></object></child>
+    <child><object class="GtkSeparatorMenuItem"/></child>
+    <child><object class="GtkMenuItem" id="malware"><property name="label">Block malware</property></object></child>
+    <child><object class="GtkMenuItem" id="full"><property name="label">Block malware + adult content</property></object></child>
+    <child><object class="GtkMenuItem" id="off"><property name="label">Turn off family filtering</property></object></child>
+    <child><object class="GtkSeparatorMenuItem"/></child>
+    <child><object class="GtkMenuItem" id="check"><property name="label">Check connection</property></object></child>
+    <child><object class="GtkMenuItem" id="register"><property name="label">Register WARP (first time)</property></object></child>
+  </object>
+</interface>

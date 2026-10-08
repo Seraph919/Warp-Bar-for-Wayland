@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Small, fixed command interface for the WARP bar widget."""
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+COMMANDS = {
+    "connect": ["connect"],
+    "disconnect": ["disconnect"],
+    "doh": ["mode", "doh"],
+    "warp+doh": ["mode", "warp+doh"],
+    "malware": ["dns", "families", "malware"],
+    "full": ["dns", "families", "full"],
+    "off": ["dns", "families", "off"],
+    "status": ["status"],
+}
+MISSING = "Cloudflare WARP is not installed (warp-cli missing). The Warp file-sharing app is a different application."
+
+
+def run(action):
+    if action not in COMMANDS and action not in ("check", "register"):
+        return {"ok": False, "message": "Unknown WARP action"}
+    cli = shutil.which("warp-cli")
+    if action == "register":
+        if cli:
+            code = subprocess.call([cli, "registration", "new"])
+            print("\nRegistration finished." if code == 0 else "\nRegistration failed.")
+        else:
+            print(MISSING)
+        input("\nPress Enter to close…")
+        return None
+    if action != "check" and not cli:
+        return {"ok": False, "available": False, "connected": False, "message": MISSING}
+    command = (["curl", "--fail", "--silent", "--show-error", "--max-time", "15",
+                "https://www.cloudflare.com/cdn-cgi/trace"] if action == "check"
+               else [cli] + COMMANDS[action])
+    try:
+        result = subprocess.run(command, capture_output=True, text=True,
+                                stdin=subprocess.DEVNULL, timeout=25,
+                                env={**os.environ, "LC_ALL": "C"})
+        output = (result.stdout + "\n" + result.stderr).strip()
+        ok = result.returncode == 0
+        message = output or ("Done" if ok else "Command failed")
+        if action == "check" and ok:
+            match = re.search(r"^warp=(\S+)", output, re.M)
+            value = match.group(1) if match else "unknown"
+            message = ("WARP tunnel is active (warp=" + value + ")." if value in ("on", "plus")
+                       else "WARP tunnel is off (warp=off). DNS-only mode does not use a tunnel." if value == "off"
+                       else "Cloudflare returned no WARP status.")
+            ok = value != "unknown"
+        return {"ok": ok, "available": bool(cli),
+                "connected": ok and bool(re.search(r"^Status update:\s*Connected\s*$", output, re.M)),
+                "message": message}
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return {"ok": False, "available": bool(cli), "connected": False, "message": str(error)}
+
+
+if __name__ == "__main__":
+    response = run(sys.argv[1] if len(sys.argv) == 2 else "")
+    if response is not None:
+        print(json.dumps(response))
